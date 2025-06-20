@@ -28,7 +28,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "tb_sala")
 public class Sala {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

@@ -1,7 +1,6 @@
 package br.com.sistema.coworking.Service;
 
 import org.springframework.stereotype.Service;
-
 import br.com.sistema.coworking.Repository.EnderecoRepository;
 
 @Service
@@ -12,4 +11,5 @@ public class EnderecoService {
     public EnderecoService(EnderecoRepository enderecoRepository) {
         this.enderecoRepository = enderecoRepository;
     }
+
 }

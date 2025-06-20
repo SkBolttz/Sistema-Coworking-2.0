@@ -7,5 +7,7 @@ import br.com.sistema.coworking.Entity.Sala;
 
 @Repository
 public interface SalaRepository extends JpaRepository<Sala,Long>{
+
+    Sala findByNome(String nome);
     
 }

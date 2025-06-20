@@ -1,32 +1,34 @@
 package br.com.sistema.coworking.Security;
 
 import java.sql.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import br.com.sistema.coworking.Entity.Visitante;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 
 @Service
 public class TokenService {
 
-    private String secret = "segredo123456";
-    private long expiration = 86400000;
+    @Value("${api.security.token.secret}")
+    private String secret;
+
+    @Value("${api.security.token.expiration}")
+    private long expirationMillis;
 
     public String gerarToken(Visitante usuario) {
-        return Jwts.builder()
-                .setIssuer("API Coworking")
-                .setSubject(usuario.getEmail())
-                .setIssuedAt(new Date(expiration))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
+        return JWT.create()
+                .withIssuer("API Coworking")
+                .withSubject(usuario.getCpf())
+                .withExpiresAt(new Date(System.currentTimeMillis() + expirationMillis))
+                .sign(Algorithm.HMAC256(secret));
     }
 
-    public String getSubject(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
+    public String validarToken(String token) {
+        return JWT.require(Algorithm.HMAC256(secret))
+                .withIssuer("API Coworking")
+                .build()
+                .verify(token)
                 .getSubject();
     }
 }

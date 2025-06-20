@@ -1,10 +1,10 @@
 package br.com.sistema.coworking.Enum;
 
 public enum TipoVisitante {
-    VISITANTE("Visitante"),
-    FUNCIONARIO("Funcionario"),
-    EMPRESA("Empresa"),
-    ADMIN("Admin");
+    VISITANTE("Visitante"), // Qualquer email sem @coworking .. @coworkingadmin
+    FUNCIONARIO("Funcionario"), // Deve conter @coworking.com.br
+    EMPRESA("Empresa"), // Somente para visitante que cadastraram sua empresa
+    ADMIN("Admin"); // Deve conter @coworkingadmin.com.br
 
     private String descricao;
 

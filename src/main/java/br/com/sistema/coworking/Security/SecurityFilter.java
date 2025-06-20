@@ -26,16 +26,15 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
 
         String tokenJWT = recuperarToken(request);
         if (tokenJWT != null) {
-            String email = tokenService.getSubject(tokenJWT);
-            Visitante usuario = visitanteRepository.findByEmail(email).orElseThrow();
+            String cpf = tokenService.validarToken(tokenJWT);
+            Visitante usuario = visitanteRepository.findByCpf(cpf).orElseThrow();
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                usuario, null, usuario.getAuthorities()
-            );
+                    usuario, null, usuario.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(auth);
         }

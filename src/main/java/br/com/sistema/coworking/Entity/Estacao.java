@@ -15,12 +15,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString
 
 @Entity
 @Table(name = "tb_estacao")
@@ -47,4 +49,5 @@ public class Estacao {
     private String fotoUrl;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataManutencao;
+    private boolean ativo;
 }

@@ -3,6 +3,7 @@ package br.com.sistema.coworking.Service;
 import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Entity.Visitante;
 import br.com.sistema.coworking.Enum.TipoVisitante;
 import br.com.sistema.coworking.Exception.Records.Cadastro.CpfExecption;
@@ -18,7 +19,8 @@ public class LoginService {
     private final EmpresaRepository empresaRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginService(VisitanteRepository visitanteRepository, EmpresaRepository empresaRepository, PasswordEncoder passwordEncoder) {
+    public LoginService(VisitanteRepository visitanteRepository, EmpresaRepository empresaRepository,
+            PasswordEncoder passwordEncoder) {
         this.visitanteRepository = visitanteRepository;
         this.empresaRepository = empresaRepository;
         this.passwordEncoder = passwordEncoder;
@@ -35,8 +37,9 @@ public class LoginService {
         }
 
         if (visitante.getEmpresa() != null) {
-            if (empresaRepository.findByCnpj(visitante.getEmpresa().getCnpj()).isEmpty()) {
-                throw new EmpresaCadastroException("Empresa não cadastrada", "O CNPJ fornecido não está registrado.");
+            Empresa empresaExiste = empresaRepository.findByCnpj(visitante.getEmpresa().getCnpj());
+            if (empresaExiste == null) {
+                throw new EmpresaCadastroException("Empresa com CNPJ", "Empresa com esse CNPJ nao cadastrada.");
             }
         }
 

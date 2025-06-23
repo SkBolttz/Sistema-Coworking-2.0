@@ -9,6 +9,7 @@ import br.com.sistema.coworking.Exception.Records.Cadastro.CadastroException;
 import br.com.sistema.coworking.Exception.Records.Cadastro.CpfExecption;
 import br.com.sistema.coworking.Exception.Records.Cadastro.EmailException;
 import br.com.sistema.coworking.Exception.Records.Cadastro.EmpresaCadastroException;
+import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
 import br.com.sistema.coworking.Exception.Records.Sala.CadastroSalaExecption;
 import br.com.sistema.coworking.Exception.Records.Visitante.DadosException;
 
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CadastroSalaExecption.class)
     public ResponseEntity<ErrorResponse> handlerCadastroSalaException(CadastroSalaExecption ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(CadastroEmpresaException.class)
+    public ResponseEntity<ErrorResponse> handlerCadastroEmpresaException(CadastroEmpresaException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

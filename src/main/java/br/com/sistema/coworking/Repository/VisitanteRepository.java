@@ -13,5 +13,7 @@ public interface VisitanteRepository extends JpaRepository<Visitante,Long>
     Optional<Visitante> findByEmail(String email);
 
     Optional<Visitante> findByCpf(String cpf);
+
+    Visitante findByNomeCompleto(String nomeCompleto);
     
 }

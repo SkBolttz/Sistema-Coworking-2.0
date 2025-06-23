@@ -7,5 +7,7 @@ import br.com.sistema.coworking.Entity.Endereco;
 
 @Repository
 public interface EnderecoRepository extends JpaRepository<Endereco,Long>{
+
+    Endereco findByLogradouroAndNumeroAndCep(String logradouro, String numero, String cep);
     
 }

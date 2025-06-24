@@ -1,6 +1,9 @@
 package br.com.sistema.coworking.Controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +62,15 @@ public class VisitanteController {
         try {
             Visitante visitante = visitanteService.obterDadosVisitante(dadosVisitante);
             return ResponseEntity.ok(visitante);
+        } catch (DadosException e) {
+            return ResponseEntity.status(400).build();
+        }
+    }
+
+    @GetMapping("/listar")
+    public ResponseEntity<List<Visitante>> listarVisitantes() {
+        try {
+            return ResponseEntity.status(200).body(visitanteService.listarVisitantes());
         } catch (DadosException e) {
             return ResponseEntity.status(400).build();
         }

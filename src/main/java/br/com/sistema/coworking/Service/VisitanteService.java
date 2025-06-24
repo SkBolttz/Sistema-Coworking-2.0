@@ -1,5 +1,8 @@
 package br.com.sistema.coworking.Service;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -66,4 +69,7 @@ public class VisitanteService {
                         "Visitante com CPF " + dadosVisitante.cpf() + " não encontrado."));
     }
 
+    public List<Visitante> listarVisitantes() {
+        return visitanteRepository.findAll();
+    }
 }

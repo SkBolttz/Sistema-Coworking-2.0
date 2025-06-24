@@ -12,6 +12,7 @@ import br.com.sistema.coworking.Exception.Records.Cadastro.EmpresaCadastroExcept
 import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
 import br.com.sistema.coworking.Exception.Records.Estacao.AtualizarEstacaoException;
 import br.com.sistema.coworking.Exception.Records.Estacao.CadastroEstacaoException;
+import br.com.sistema.coworking.Exception.Records.Reserva.ReservaCadastroException;
 import br.com.sistema.coworking.Exception.Records.Sala.CadastroSalaExecption;
 import br.com.sistema.coworking.Exception.Records.Visitante.DadosException;
 
@@ -68,6 +69,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AtualizarEstacaoException.class)
     public ResponseEntity<ErrorResponse> handlerAtualizarEstacaoException(AtualizarEstacaoException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ReservaCadastroException.class)
+    public ResponseEntity<ErrorResponse> handlerReservaException(ReservaCadastroException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

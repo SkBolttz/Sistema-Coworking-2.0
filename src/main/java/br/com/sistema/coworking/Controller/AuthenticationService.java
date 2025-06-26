@@ -18,6 +18,7 @@ import br.com.sistema.coworking.Security.TokenService;
 import br.com.sistema.coworking.Service.LoginService;
 import jakarta.validation.Valid;
 
+
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationService {

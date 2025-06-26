@@ -110,9 +110,6 @@ public class VisitanteController {
 
     @GetMapping("/listar")
     @Operation(summary = "Listar visitantes", description = "Lista os visitantes com base nas informações fornecidas no corpo da requisição.")
-    @Parameters({
-            @Parameter(name = "pageable", description = "Parâmetros de paginação."),
-    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Visitantes listados com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao listar visitantes."),

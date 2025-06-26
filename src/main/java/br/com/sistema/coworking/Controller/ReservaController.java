@@ -20,7 +20,7 @@ import br.com.sistema.coworking.Service.ReservaService;
 
 @RestController
 @RequestMapping("/reserva")
-@Tag(name = "Reserva", description = "API para gerenciamento de reservas")
+@Tag(name = "Reserva", description = "Controller responsável por gerenciar as informações das reservas.")
 public class ReservaController {
 
     private final ReservaService reservaService;

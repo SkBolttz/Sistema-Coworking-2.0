@@ -120,9 +120,6 @@ public class SalaController {
 
     @GetMapping("/listar-todas")
     @Operation(summary = "Listar todas as salas", description = "Lista todas as salas com base nas informações fornecidas no corpo da requisição.")
-    @Parameters({
-            @Parameter(name = "pageable", description = "Informações da sala para obter."),
-    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Salas obtidas com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao obter salas."),
@@ -139,9 +136,6 @@ public class SalaController {
 
     @GetMapping("/listar-disponiveis")
     @Operation(summary = "Listar salas disponíveis", description = "Lista as salas disponíveis com base nas informações fornecidas no corpo da requisição.")
-    @Parameters({
-            @Parameter(name = "pageable", description = "Informações da sala para obter."),
-    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Salas obtidas com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao obter salas."),
@@ -158,9 +152,6 @@ public class SalaController {
 
     @GetMapping("/listar-indisponiveis")
     @Operation(summary = "Listar salas indisponíveis", description = "Lista as salas indisponíveis com base nas informações fornecidas no corpo da requisição.")
-    @Parameters({
-            @Parameter(name = "pageable", description = "Informações da sala para obter."),
-    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Salas obtidas com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao obter salas."),

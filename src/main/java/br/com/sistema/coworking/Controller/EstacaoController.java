@@ -1,7 +1,8 @@
 package br.com.sistema.coworking.Controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.sistema.coworking.DTO.Estacao.AtualizarEstacaoDTO;
 import br.com.sistema.coworking.Entity.Estacao;
 import br.com.sistema.coworking.Exception.Records.Estacao.AtualizarEstacaoException;
@@ -82,29 +82,33 @@ public class EstacaoController {
     }
 
     @GetMapping("/listar-todas")
-    public ResponseEntity<List<Estacao>> listarEstacoes() {
+    public ResponseEntity<Page<Estacao>> listarEstacoes(
+            @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(estacaoService.listarEstacoes());
+            return ResponseEntity.ok(estacaoService.listarEstacoes(pageable));
         } catch (AtualizarEstacaoException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 
     @GetMapping("/listar-ativas")
-    public ResponseEntity<List<Estacao>> listarEstacoesAtivas() {
+    public ResponseEntity<Page<Estacao>> listarEstacoesAtivas(
+            @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(estacaoService.listarEstacoesAtivas());
+            return ResponseEntity.ok(estacaoService.listarEstacoesAtivas(pageable));
         } catch (AtualizarEstacaoException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 
     @GetMapping("/listar-inativas")
-    public ResponseEntity<List<Estacao>> listarEstacoesInativas() {
+    public ResponseEntity<Page<Estacao>> listarEstacoesInativas(
+            @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(estacaoService.listarEstacoesInativas());
+            return ResponseEntity.ok(estacaoService.listarEstacoesInativas(pageable));
         } catch (AtualizarEstacaoException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
+
 }

@@ -1,7 +1,8 @@
 package br.com.sistema.coworking.Controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.sistema.coworking.DTO.Visitante.AtualizarVisitante;
 import br.com.sistema.coworking.Entity.Visitante;
 import br.com.sistema.coworking.Exception.Records.Visitante.AtualizarDadosException;
@@ -68,11 +68,13 @@ public class VisitanteController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Visitante>> listarVisitantes() {
+    public ResponseEntity<Page<Visitante>> listarVisitantes(
+            @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(visitanteService.listarVisitantes());
+            return ResponseEntity.status(200).body(visitanteService.listarVisitantes(pageable));
         } catch (DadosException e) {
             return ResponseEntity.status(400).build();
         }
     }
+
 }

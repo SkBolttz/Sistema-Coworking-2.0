@@ -1,15 +1,19 @@
 package br.com.sistema.coworking.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import br.com.sistema.coworking.DTO.Empresa.AtualizarEmpresaDTO;
 import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Entity.Visitante;
 import br.com.sistema.coworking.Enum.AprovacaoStatus;
+import br.com.sistema.coworking.Exception.Records.Empresa.AtualizarEmpresaException;
 import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
 import br.com.sistema.coworking.Repository.EmpresaRepository;
 import br.com.sistema.coworking.Repository.VisitanteRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class EmpresaService {
@@ -25,7 +29,63 @@ public class EmpresaService {
         this.visitanteRepository = visitanteRepository;
     }
 
+    @Transactional
     public void cadastro(Empresa empresa) {
+
+        Optional<Visitante> visitanteExistente = visitanteRepository.findByCpf(empresa.getResponsavel().getCpf());
+
+        System.out.println(empresa);
+        verificarCadastro(empresa, visitanteExistente);
+        aplicandoCadastro(empresa, visitanteExistente);
+
+        empresaRepository.save(empresa);
+    }
+
+    public void ativar(AtualizarEmpresaDTO empresa) {
+
+        Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
+        verificarAtivacao(empresa, empresaExiste);
+
+        empresaExiste.setAtivo(true);
+        empresaRepository.save(empresaExiste);
+    }
+
+    public void desativar(AtualizarEmpresaDTO empresa) {
+
+        Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
+        verificarDesativacao(empresa, empresaExiste);
+
+        empresaExiste.setAtivo(false);
+        empresaRepository.save(empresaExiste);
+    }
+
+    public void atualizar(AtualizarEmpresaDTO empresa) {
+
+        Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
+        verificarAtualizacao(empresa, empresaExiste);
+        aplicandoAtualizacao(empresa, empresaExiste);
+
+        empresaRepository.save(empresaExiste);
+    }
+
+    public Empresa obter(AtualizarEmpresaDTO empresa) {
+
+        return obterEmpresa(empresa);
+    }
+
+    public Page<Empresa> listarEmpresas(Pageable pageable) {
+        return empresaRepository.findAll(pageable);
+    }
+
+    public Page<Empresa> listarEmpresasAtivas(Pageable pageable) {
+        return empresaRepository.findByAtivoTrue(pageable);
+    }
+
+    public Page<Empresa> listarEmpresasInativas(Pageable pageable) {
+        return empresaRepository.findByAtivoFalse(pageable);
+    }
+
+    private void verificarCadastro(Empresa empresa, Optional<Visitante> visitanteExistente) {
 
         Empresa nomeFantasia = empresaRepository.findByNomeFantasia(empresa.getNomeFantasia());
         Empresa razaoSocial = empresaRepository.findByRazaoSocial(empresa.getRazaoSocial());
@@ -50,57 +110,76 @@ public class EmpresaService {
                     "Empresa com esse telefone ja cadastrada.");
         }
 
-        Visitante visitanteExistente = visitanteRepository
-                .findByNomeCompleto(empresa.getResponsavel().getNomeCompleto());
-
         if (visitanteExistente == null) {
             throw new CadastroEmpresaException("Visitante com nome",
                     "Visitante com esse nome nao cadastrado.");
         }
+    }
 
-        empresa.setResponsavel(visitanteExistente);
+    private void aplicandoCadastro(Empresa empresa, Optional<Visitante> visitanteExistente) {
+
+        empresa.setResponsavel(visitanteExistente.get());
         empresa.setAtivo(true);
         empresa.setDataCriacao(LocalDateTime.now());
         empresa.setStatus(AprovacaoStatus.PENDENTE);
         empresa.setEndereco(enderecoService.cadastrarEndereco(empresa.getEndereco()));
-        empresaRepository.save(empresa);
     }
 
-    public void ativar(AtualizarEmpresaDTO empresa) {
-
-        Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
+    private void verificarAtivacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
 
         if (empresaExiste == null) {
-            throw new CadastroEmpresaException("Empresa com CNPJ",
+            throw new AtualizarEmpresaException("Empresa com CNPJ",
+                    "Empresa com esse CNPJ nao cadastrada.");
+        }
+    }
+
+    private void verificarDesativacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
+
+        if (empresaExiste == null) {
+            throw new AtualizarEmpresaException("Empresa com CNPJ",
+                    "Empresa com esse CNPJ nao cadastrada.");
+        }
+    }
+
+    private void verificarAtualizacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
+
+        if (empresaExiste == null) {
+            throw new AtualizarEmpresaException("Empresa com CNPJ",
                     "Empresa com esse CNPJ nao cadastrada.");
         }
 
-        empresaExiste.setAtivo(true);
-        empresaRepository.save(empresaExiste);
-    }
+        if (empresa.responsavel() != null) {
+            Visitante visitanteExistente = visitanteRepository
+                    .findByNomeCompleto(empresa.responsavel().getNomeCompleto());
 
-    public void desativar(AtualizarEmpresaDTO empresa) {
-
-        System.out.println(empresa.cnpj());
-        Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
-
-        if (empresaExiste == null) {
-            throw new CadastroEmpresaException("Empresa com CNPJ",
-                    "Empresa com esse CNPJ nao cadastrada.");
+            if (visitanteExistente == null) {
+                throw new AtualizarEmpresaException("Visitante com nome",
+                        "Visitante com esse nome nao cadastrado.");
+            }
         }
 
-        empresaExiste.setAtivo(false);
-        empresaRepository.save(empresaExiste);
+        if (empresaRepository.findByNomeFantasia(empresa.nomeFantasia()) != null) {
+            throw new AtualizarEmpresaException("Empresa com nome fantasia",
+                    "Empresa com esse nome fantasia ja cadastrada.");
+        }
+
+        if (empresaRepository.findByRazaoSocial(empresa.razaoSocial()) != null) {
+            throw new AtualizarEmpresaException("Empresa com razao social",
+                    "Empresa com essa razao social ja cadastrada.");
+        }
+
+        if (empresaRepository.findByEmail(empresa.email()) != null) {
+            throw new AtualizarEmpresaException("Empresa com email",
+                    "Empresa com esse email ja cadastrada.");
+        }
+
+        if (empresaRepository.findByTelefone(empresa.telefone()) != null) {
+            throw new AtualizarEmpresaException("Empresa com telefone",
+                    "Empresa com esse telefone ja cadastrada.");
+        }
     }
 
-    public void atualizar(AtualizarEmpresaDTO empresa) {
-
-        Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
-
-        if (empresaExiste == null) {
-            throw new CadastroEmpresaException("Empresa com CNPJ",
-                    "Empresa com esse CNPJ nao cadastrada.");
-        }
+    private void aplicandoAtualizacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
 
         if (empresa.nomeFantasia() != null) {
             empresaExiste.setNomeFantasia(empresa.nomeFantasia());
@@ -123,48 +202,28 @@ public class EmpresaService {
         }
 
         if (empresa.responsavel() != null) {
-            Visitante visitanteExistente = visitanteRepository
-                    .findByNomeCompleto(empresa.responsavel().getNomeCompleto());
-
-            if (visitanteExistente == null) {
-                throw new CadastroEmpresaException("Visitante com nome",
-                        "Visitante com esse nome nao cadastrado.");
-            }
-
-            empresaExiste.setResponsavel(visitanteExistente);
+            empresaExiste.setResponsavel(empresa.responsavel());
         }
 
         if (empresa.endereco() != null) {
             empresaExiste.setEndereco(enderecoService.cadastrarEndereco(empresa.endereco()));
         }
-
-        empresaRepository.save(empresaExiste);
-
     }
 
-    public String obter(AtualizarEmpresaDTO empresa) {
-        return empresaRepository.findByCnpj(empresa.cnpj()).toString();
+    private Empresa obterEmpresa(AtualizarEmpresaDTO empresa) {
+
+        return empresaRepository.findByCnpj(empresa.cnpj());
     }
 
-    public List<Empresa> listarEmpresas() {
-        return empresaRepository.findAll()
-                .stream()
-                .toList();
+    public Page<Empresa> listagemEmpresas(Pageable pageable) {
+        return empresaRepository.findAll(pageable);
     }
 
-    public List<Empresa> listarEmpresasAtivas() {
-
-        return empresaRepository.findAll()
-                .stream()
-                .filter(e -> e.isAtivo() == true)
-                .toList();
+    public Page<Empresa> listagemEmpresasAtivas(Pageable pageable) {
+        return empresaRepository.findByAtivoTrue(pageable);
     }
 
-    public List<Empresa> listarEmpresasInativas() {
-
-        return empresaRepository.findAll()
-                .stream()
-                .filter(e -> e.isAtivo() == false)
-                .toList();
+    public Page<Empresa> listagemEmpresasInativas(Pageable pageable) {
+        return empresaRepository.findByAtivoFalse(pageable);
     }
 }

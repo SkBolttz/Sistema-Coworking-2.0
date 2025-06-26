@@ -15,14 +15,15 @@ public class EnderecoService {
     }
 
     public Endereco cadastrarEndereco(Endereco endereco) {
-
-        Endereco enderecoExiste = enderecoRepository.findByLogradouroAndNumeroAndCep(endereco.getLogradouro(),
-                endereco.getNumero(), endereco.getCep());
+        Endereco enderecoExiste = enderecoRepository.findByLogradouroAndNumeroAndCep(
+                endereco.getLogradouro(), endereco.getNumero(), endereco.getCep());
 
         if (enderecoExiste == null) {
             enderecoRepository.save(endereco);
+            return endereco;
         }
 
         return enderecoExiste;
     }
+
 }

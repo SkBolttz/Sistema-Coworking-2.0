@@ -28,6 +28,18 @@ public class LoginService {
 
     public void registro(Visitante visitante) {
 
+        verificandoCadastro(visitante);
+        atribuirTipoVisitantePorEmail(visitante);
+
+        visitante.setDataCadastro(LocalDateTime.now());
+        visitante.setAtivo(true);
+        visitante.setSenha(passwordEncoder.encode(visitante.getSenha()));
+
+        visitanteRepository.save(visitante);
+    }
+
+    private void verificandoCadastro(Visitante visitante) {
+
         if (visitanteRepository.findByEmail(visitante.getEmail()).isPresent()) {
             throw new EmailException("Email já cadastrado", "O email fornecido já está em uso.");
         }
@@ -42,20 +54,16 @@ public class LoginService {
                 throw new EmpresaCadastroException("Empresa com CNPJ", "Empresa com esse CNPJ nao cadastrada.");
             }
         }
+    }
 
-        visitante.setDataCadastro(LocalDateTime.now());
+    private void atribuirTipoVisitantePorEmail(Visitante visitante) {
 
-        if (visitante.getEmail().contains("@coworking.com.br")) {
+        if (visitante.getEmail().endsWith("@coworking.com.br")) {
             visitante.setTipo(TipoVisitante.FUNCIONARIO);
-        } else if (visitante.getEmail().contains("@coworkingadmin.com.br")) {
+        } else if (visitante.getEmail().endsWith("@coworkingadmin.com.br")) {
             visitante.setTipo(TipoVisitante.ADMIN);
         } else {
             visitante.setTipo(TipoVisitante.VISITANTE);
         }
-
-        visitante.setAtivo(true);
-        visitante.setSenha(passwordEncoder.encode(visitante.getSenha()));
-
-        visitanteRepository.save(visitante);
     }
 }

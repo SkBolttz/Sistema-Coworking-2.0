@@ -19,36 +19,35 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString
 
 @Entity
 @Table(name = "tb_reservas")
 public class Reserva {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotNull
     @Enumerated(EnumType.STRING)
     private TipoReserva tipo;
-    @NotNull
     @ManyToOne(targetEntity = Sala.class)
     private Sala sala;
-    @NotNull
     @ManyToOne(targetEntity = Estacao.class)
     private Estacao estacao;
     @NotNull
     @ManyToOne(targetEntity = Visitante.class)
     private Visitante visitante;
     @NotNull
-    @ManyToOne(targetEntity = Empresa.class)
-    private Empresa empresa;
     private LocalDateTime dataInicio;
+    @NotNull
     private LocalDateTime dataFim;
     @Enumerated(EnumType.STRING)
     private StatusReserva status;

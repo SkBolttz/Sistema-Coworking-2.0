@@ -9,12 +9,19 @@ import br.com.sistema.coworking.Exception.Records.Cadastro.CadastroException;
 import br.com.sistema.coworking.Exception.Records.Cadastro.CpfExecption;
 import br.com.sistema.coworking.Exception.Records.Cadastro.EmailException;
 import br.com.sistema.coworking.Exception.Records.Cadastro.EmpresaCadastroException;
+import br.com.sistema.coworking.Exception.Records.Empresa.AtualizarEmpresaException;
 import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
 import br.com.sistema.coworking.Exception.Records.Estacao.AtualizarEstacaoException;
 import br.com.sistema.coworking.Exception.Records.Estacao.CadastroEstacaoException;
+import br.com.sistema.coworking.Exception.Records.Estacao.EstacaoException;
+import br.com.sistema.coworking.Exception.Records.Estacao.EstacaoReservaException;
 import br.com.sistema.coworking.Exception.Records.Reserva.ReservaCadastroException;
+import br.com.sistema.coworking.Exception.Records.Reserva.ReservaException;
 import br.com.sistema.coworking.Exception.Records.Sala.CadastroSalaExecption;
+import br.com.sistema.coworking.Exception.Records.Sala.ReservaSalaException;
+import br.com.sistema.coworking.Exception.Records.Sala.SalaException;
 import br.com.sistema.coworking.Exception.Records.Visitante.DadosException;
+import br.com.sistema.coworking.Exception.Records.Visitante.VisitanteException ;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -75,6 +82,48 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReservaCadastroException.class)
     public ResponseEntity<ErrorResponse> handlerReservaException(ReservaCadastroException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(EstacaoReservaException.class)
+    public ResponseEntity<ErrorResponse> handlerEstacaoReservaException(EstacaoReservaException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ReservaSalaException.class)
+    public ResponseEntity<ErrorResponse> handlerReservaSalaException(ReservaSalaException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(VisitanteException .class)
+    public ResponseEntity<ErrorResponse> handlerVisitanteException(VisitanteException  ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ReservaException.class)
+    public ResponseEntity<ErrorResponse> handlerReservaException(ReservaException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(AtualizarEmpresaException.class)
+    public ResponseEntity<ErrorResponse> handlerAtualizarEmpresaException(AtualizarEmpresaException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(EstacaoException.class)
+    public ResponseEntity<ErrorResponse> handlerEstacaoException(EstacaoException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(SalaException.class)
+    public ResponseEntity<ErrorResponse> handlerSalaException(SalaException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getErro(), ex.getDetalhe());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

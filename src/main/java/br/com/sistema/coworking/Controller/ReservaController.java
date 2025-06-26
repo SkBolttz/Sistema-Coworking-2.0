@@ -2,13 +2,10 @@ package br.com.sistema.coworking.Controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.sistema.coworking.DTO.Reserva.AtualizarReservaDTO;
 import br.com.sistema.coworking.Entity.Reserva;
@@ -28,7 +25,6 @@ public class ReservaController {
 
     @PostMapping("/criar")
     public ResponseEntity<String> criarReserva(@RequestBody @Valid Reserva reserva) {
-
         try {
             reservaService.criarReserva(reserva);
             return ResponseEntity.status(200).body("Reserva criada com sucesso!");
@@ -39,7 +35,6 @@ public class ReservaController {
 
     @PutMapping("/atualizar")
     public ResponseEntity<String> atualizarReserva(@RequestBody @Valid AtualizarReservaDTO reserva) {
-
         try {
             reservaService.atualizarReserva(reserva);
             return ResponseEntity.status(200).body("Reserva atualizada com sucesso!");
@@ -50,7 +45,6 @@ public class ReservaController {
 
     @PutMapping("/cancelar")
     public ResponseEntity<String> cancelarReserva(@RequestBody @Valid AtualizarReservaDTO reserva) {
-
         try {
             reservaService.cancelarReserva(reserva);
             return ResponseEntity.status(200).body("Reserva cancelada com sucesso!");
@@ -60,26 +54,27 @@ public class ReservaController {
     }
 
     @GetMapping("/listar-todas")
-    public ResponseEntity<List<Reserva>> listarReservas() {
+    public ResponseEntity<Page<Reserva>> listarReservas(Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(reservaService.listarReservas());
+            return ResponseEntity.status(200).body(reservaService.listarReservas(pageable));
         } catch (ReservaCadastroException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 
     @GetMapping("/listar-ativas")
-    public ResponseEntity<List<Reserva>> listarReservasAtivas() {
+    public ResponseEntity<Page<Reserva>> listarReservasAtivas(Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(reservaService.listarReservasAtivas());
+            return ResponseEntity.status(200).body(reservaService.listarReservasAtivas(pageable));
         } catch (ReservaCadastroException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 
     @PostMapping("/listar-por-usuario")
     public ResponseEntity<List<Reserva>> listarReservasPorUsuario(@RequestBody @Valid AtualizarReservaDTO reserva) {
         try {
+            System.out.println(">>> Entrou no método listarReservasPorUsuario()");
             return ResponseEntity.status(200).body(reservaService.listarReservasPorUsuario(reserva));
         } catch (ReservaCadastroException e) {
             return ResponseEntity.status(400).body(null);

@@ -7,13 +7,12 @@ import org.springframework.stereotype.Repository;
 import br.com.sistema.coworking.Entity.Visitante;
 
 @Repository
-public interface VisitanteRepository extends JpaRepository<Visitante,Long>
-{
+public interface VisitanteRepository extends JpaRepository<Visitante, Long> {
 
     Optional<Visitante> findByEmail(String email);
 
     Optional<Visitante> findByCpf(String cpf);
 
     Visitante findByNomeCompleto(String nomeCompleto);
-    
+
 }

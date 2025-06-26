@@ -1,15 +1,10 @@
 package br.com.sistema.coworking.Controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import br.com.sistema.coworking.DTO.Empresa.AtualizarEmpresaDTO;
 import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
@@ -76,29 +71,32 @@ public class EmpresaController {
     }
 
     @GetMapping("/listar-todas")
-    public ResponseEntity<List<Empresa>> listarEmpresas() {
+    public ResponseEntity<Page<Empresa>> listarEmpresas(
+        @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(empresaService.listarEmpresas());
+            return ResponseEntity.status(200).body(empresaService.listarEmpresas(pageable));
         } catch (CadastroEmpresaException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 
     @GetMapping("/listar-ativas")
-    public ResponseEntity<List<Empresa>> listarEmpresasAtivas() {
+    public ResponseEntity<Page<Empresa>> listarEmpresasAtivas(
+        @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(empresaService.listarEmpresasAtivas());
+            return ResponseEntity.status(200).body(empresaService.listarEmpresasAtivas(pageable));
         } catch (CadastroEmpresaException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 
     @GetMapping("/listar-inativas")
-    public ResponseEntity<List<Empresa>> listarEmpresasInativas() {
+    public ResponseEntity<Page<Empresa>> listarEmpresasInativas(
+        @PageableDefault(size = 10) Pageable pageable) {
         try {
-            return ResponseEntity.status(200).body(empresaService.listarEmpresasInativas());
+            return ResponseEntity.status(200).body(empresaService.listarEmpresasInativas(pageable));
         } catch (CadastroEmpresaException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body(Page.empty());
         }
     }
 }

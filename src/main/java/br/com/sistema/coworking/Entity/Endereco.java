@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @ToString
 
@@ -39,4 +37,14 @@ public class Endereco {
     private String estado;
     @NotBlank
     private String pais;
+
+    public Endereco(long id, @NotBlank String logradouro, @NotBlank String cep,
+            @NotBlank String cidade, @NotBlank String estado, @NotBlank String pais) {
+        this.id = id;
+        this.logradouro = logradouro;
+        this.cep = cep;
+        this.cidade = cidade;
+        this.estado = estado;
+        this.pais = pais;
+    }
 }

@@ -2,9 +2,11 @@ package br.com.sistema.coworking.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import br.com.sistema.coworking.DTO.Empresa.AtualizarEmpresaDTO;
 import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Entity.Visitante;
@@ -34,7 +36,6 @@ public class EmpresaService {
 
         Optional<Visitante> visitanteExistente = visitanteRepository.findByCpf(empresa.getResponsavel().getCpf());
 
-        System.out.println(empresa);
         verificarCadastro(empresa, visitanteExistente);
         aplicandoCadastro(empresa, visitanteExistente);
 
@@ -125,7 +126,7 @@ public class EmpresaService {
         empresa.setEndereco(enderecoService.cadastrarEndereco(empresa.getEndereco()));
     }
 
-    private void verificarAtivacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
+    private void verificarAtivacao(@SuppressWarnings("unused") AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
 
         if (empresaExiste == null) {
             throw new AtualizarEmpresaException("Empresa com CNPJ",
@@ -133,7 +134,7 @@ public class EmpresaService {
         }
     }
 
-    private void verificarDesativacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
+    private void verificarDesativacao(@SuppressWarnings("unused") AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
 
         if (empresaExiste == null) {
             throw new AtualizarEmpresaException("Empresa com CNPJ",

@@ -16,7 +16,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @ToString
 
@@ -65,5 +63,24 @@ public class Empresa {
     @Enumerated(EnumType.STRING)
     private AprovacaoStatus status;
     private boolean ativo;
+
+    public Empresa(long id, @NotBlank String nomeFantasia, @NotBlank String razaoSocial, @NotBlank String cnpj,
+            @NotBlank @Email String email, @NotBlank String telefone, Visitante responsavel, @NotBlank String ramo,
+            @NotNull Endereco endereco, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao,
+            AprovacaoStatus status, boolean ativo) {
+        this.id = id;
+        this.nomeFantasia = nomeFantasia;
+        this.razaoSocial = razaoSocial;
+        this.cnpj = cnpj;
+        this.email = email;
+        this.telefone = telefone;
+        this.responsavel = responsavel;
+        this.ramo = ramo;
+        this.endereco = endereco;
+        this.dataCriacao = dataCriacao;
+        this.dataAtualizacao = dataAtualizacao;
+        this.status = status;
+        this.ativo = ativo;
+    }
 
 }

@@ -97,18 +97,25 @@ public class Visitante implements UserDetails {
                 ", ativo=" + ativo +
                 '}';
     }
+
+    public Visitante(long id,
+            @NotBlank @Size(min = 10, max = 40, message = "Nome de usuario deve ter entre 10 e 40 caracteres") String nomeCompleto,
+            @NotBlank @Size(min = 11, max = 11, message = "CPF deve ter 11 digitos") String cpf,
+            @NotBlank @Email String email, @NotBlank String senha,
+            @NotBlank @Size(min = 11, max = 11, message = "Telefone deve ter 11 digitos") String telefone,
+            @NotBlank String fotoDocumentoUrl, String observacao, LocalDateTime dataCadastro,
+            @NotNull TipoVisitante tipo, boolean ativo) {
+        this.id = id;
+        this.nomeCompleto = nomeCompleto;
+        this.cpf = cpf;
+        this.email = email;
+        this.senha = senha;
+        this.telefone = telefone;
+        this.fotoDocumentoUrl = fotoDocumentoUrl;
+        this.observacao = observacao;
+        this.dataCadastro = dataCadastro;
+        this.tipo = tipo;
+        this.ativo = ativo;
+    }
+
 }
-
-// Todos os usuarios devem realizar cadastro / login, mas sera que empresa
-// precisa tambem?
-// Como a empresa se cadastraria? Atraves de um form? Se sim, quem iria aprovar?
-// Teria que ter funcionario?
-
-// Posso fazer com que somente os visitante realizem cadastro / login, Empresas
-// para sua cadastracao deve ser enviado um form
-// Apos aprovacao de cadastro, as empresas poderiam cadastrar seus funcionarios
-
-// Sera que e uma boa ideia? Ou nao?
-
-// Neste caso, se levar em consideracao o Login / Registro, deve de haver senhas
-// para acesso

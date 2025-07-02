@@ -12,4 +12,8 @@ public record AtualizarSalaDTO(
         String localizacao,
         String fotoUrl) {
 
+    public AtualizarSalaDTO(long id, String nome, String descricao, int quantidade, boolean disponivel,
+            String localizacao, String fotoUrl) {
+        this(id, nome, descricao, quantidade, disponivel, null, localizacao, fotoUrl);
+    }
 }

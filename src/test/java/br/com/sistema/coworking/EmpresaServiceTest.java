@@ -1,10 +1,9 @@
-package br.com.sistema.coworking.Service;
+package br.com.sistema.coworking;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.times;
@@ -25,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import br.com.sistema.coworking.DTO.Empresa.AtualizarEmpresaDTO;
 import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Entity.Endereco;
@@ -36,6 +32,8 @@ import br.com.sistema.coworking.Exception.Records.Empresa.AtualizarEmpresaExcept
 import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
 import br.com.sistema.coworking.Repository.EmpresaRepository;
 import br.com.sistema.coworking.Repository.VisitanteRepository;
+import br.com.sistema.coworking.Service.EmpresaService;
+import br.com.sistema.coworking.Service.EnderecoService;
 
 @ExtendWith(MockitoExtension.class)
 public class EmpresaServiceTest {
@@ -52,7 +50,7 @@ public class EmpresaServiceTest {
 
     private Endereco criarEndereco() {
 
-        Endereco endereco = new Endereco(1L, "rua", "89031576", "cidade", "estado", "pais");
+        Endereco endereco = new Endereco(1L, "rua", "89031576", "cidade", "estado", "pais", null);
 
         return endereco;
     }

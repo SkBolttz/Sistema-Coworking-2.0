@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-
 @Entity
 @Table(name = "tb_sala")
 public class Sala {
@@ -49,4 +46,19 @@ public class Sala {
     private String localizacao;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataManutencao;
+
+    public Sala(long id, String nome, String descricao, int quantidade, boolean disponivel, TipoSala tipo,
+            String fotoUrl,
+            String localizacao, LocalDateTime dataCriacao, LocalDateTime dataManutencao) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.quantidade = quantidade;
+        this.disponivel = disponivel;
+        this.tipo = tipo;
+        this.fotoUrl = fotoUrl;
+        this.localizacao = localizacao;
+        this.dataCriacao = dataCriacao;
+        this.dataManutencao = dataManutencao;
+    }
 }

@@ -39,12 +39,13 @@ public class Endereco {
     private String pais;
 
     public Endereco(long id, @NotBlank String logradouro, @NotBlank String cep,
-            @NotBlank String cidade, @NotBlank String estado, @NotBlank String pais) {
+            @NotBlank String cidade, @NotBlank String estado, @NotBlank String pais, @NotBlank String numero) {
         this.id = id;
         this.logradouro = logradouro;
         this.cep = cep;
         this.cidade = cidade;
         this.estado = estado;
         this.pais = pais;
+        this.numero = numero;
     }
 }

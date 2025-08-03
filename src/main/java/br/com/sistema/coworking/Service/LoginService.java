@@ -3,6 +3,8 @@ package br.com.sistema.coworking.Service;
 import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Entity.Visitante;
 import br.com.sistema.coworking.Enum.TipoVisitante;
@@ -26,7 +28,7 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void registro(Visitante visitante) {
+    public void registro(Visitante visitante, MultipartFile file) {
 
         verificandoCadastro(visitante);
         atribuirTipoVisitantePorEmail(visitante);
@@ -34,6 +36,10 @@ public class LoginService {
         visitante.setDataCadastro(LocalDateTime.now());
         visitante.setAtivo(true);
         visitante.setSenha(passwordEncoder.encode(visitante.getSenha()));
+
+        if (file != null) {
+            visitante.setFotoDocumentoUrl(file.getOriginalFilename());
+        }
 
         visitanteRepository.save(visitante);
     }

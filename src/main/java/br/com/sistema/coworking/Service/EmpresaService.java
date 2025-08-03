@@ -2,11 +2,9 @@ package br.com.sistema.coworking.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import br.com.sistema.coworking.DTO.Empresa.AtualizarEmpresaDTO;
 import br.com.sistema.coworking.Entity.Empresa;
 import br.com.sistema.coworking.Entity.Visitante;

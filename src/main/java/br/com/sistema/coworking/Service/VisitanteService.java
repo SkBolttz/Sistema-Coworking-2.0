@@ -1,14 +1,20 @@
 package br.com.sistema.coworking.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import br.com.sistema.coworking.DTO.Visitante.AtualizarVisitante;
 import br.com.sistema.coworking.Entity.Visitante;
 import br.com.sistema.coworking.Exception.Records.Visitante.AtualizarDadosException;
 import br.com.sistema.coworking.Exception.Records.Visitante.VisitanteException;
 import br.com.sistema.coworking.Repository.VisitanteRepository;
+import jakarta.validation.Valid;
 
 @Service
 public class VisitanteService {
@@ -21,11 +27,35 @@ public class VisitanteService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void atualizarDados(AtualizarVisitante atualizarVisitante) {
+    public void atualizarDados(AtualizarVisitante atualizarVisitante, MultipartFile fotoDocumento) {
 
         Visitante visitante = visitanteRepository.findByCpf(atualizarVisitante.cpf())
                 .orElseThrow(() -> new VisitanteException(
                         "Visitante com CPF " + atualizarVisitante.cpf() + " não encontrado.", ""));
+
+        if (fotoDocumento != null && !fotoDocumento.isEmpty()) {
+            try {
+                String diretorio = new File("imagens/funcionarios").getAbsolutePath();
+
+                String nomeArquivoSeguro = fotoDocumento.getOriginalFilename()
+                        .replaceAll(" ", "_")
+                        .replaceAll("\\(", "_")
+                        .replaceAll("\\)", "");
+
+                File pasta = new File(diretorio);
+                if (!pasta.exists()) {
+                    pasta.mkdirs();
+                }
+
+                File destino = new File(pasta, nomeArquivoSeguro);
+                fotoDocumento.transferTo(destino);
+
+                visitante.setFotoDocumentoUrl(nomeArquivoSeguro);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar a imagem: " + e.getMessage());
+            }
+        }
 
         verificarAtualizacao(visitante, atualizarVisitante);
         aplicarAtualizacao(visitante, atualizarVisitante);
@@ -63,6 +93,11 @@ public class VisitanteService {
         return listagemVisitantes(pageable);
     }
 
+    public Visitante obterDadosPorId(AtualizarVisitante dadosVisitante) {
+
+        return obterDadosId(dadosVisitante);
+    }
+
     private void verificarAtualizacao(Visitante visitante, AtualizarVisitante atualizarVisitante) {
 
         if (atualizarVisitante.email() != null) {
@@ -96,8 +131,48 @@ public class VisitanteService {
                 "Visitante com CPF " + dadosVisitante.cpf() + " não encontrado.", ""));
     }
 
+    private Visitante obterDadosId(AtualizarVisitante dadosVisitante) {
+
+        return visitanteRepository.findById(dadosVisitante.id()).orElseThrow(() -> new VisitanteException(
+                "Visitante com ID " + dadosVisitante.id() + " não encontrado.", ""));
+    }
+
     private Page<Visitante> listagemVisitantes(Pageable pageable) {
 
         return visitanteRepository.findAll(pageable);
+    }
+
+    public Boolean verificarEmail(@Valid AtualizarVisitante atualizarVisitante) {
+
+        return visitanteRepository.findByCpf(atualizarVisitante.cpf())
+                .stream()
+                .anyMatch(e -> e.getEmail().contains("@coworkingadmin.com.br")
+                        || e.getEmail().contains("@coworking.com.br"));
+    }
+
+    public Page<Visitante> listarFuncionario(Pageable pageable) {
+        return visitanteRepository.findByEmailContainingFuncionario("coworking.com.br", "coworkingadmin.com.br",
+                pageable);
+    }
+
+    public void trocarSenha(AtualizarVisitante atualizarVisitante) {
+        Visitante visitanteExiste = visitanteRepository.findById(atualizarVisitante.id())
+                .orElseThrow(() -> new VisitanteException(
+                        "Visitante com CPF " + atualizarVisitante.cpf() + " não encontrado.", ""));
+
+        if (passwordEncoder.matches(atualizarVisitante.senha(), visitanteExiste.getPassword())) {
+            if (atualizarVisitante.novaSenha().equals(atualizarVisitante.confirmaSenha())) {
+                visitanteExiste.setSenha(passwordEncoder.encode(atualizarVisitante.novaSenha()));
+                visitanteRepository.save(visitanteExiste);
+            } else {
+                throw new VisitanteException("Senhas nao conferem", "");
+            }
+        } else {
+            throw new VisitanteException("Senha atual incorreta", "");
+        }
+    }
+
+    public List<Visitante> listarVisitantesDisponiveis() {
+        return visitanteRepository.findByEmpresaIsNull();
     }
 }

@@ -1,9 +1,12 @@
 package br.com.sistema.coworking.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import br.com.sistema.coworking.DTO.Estacao.AtualizarEstacaoDTO;
 import br.com.sistema.coworking.Entity.Estacao;
 import br.com.sistema.coworking.Entity.Sala;
@@ -23,9 +26,33 @@ public class EstacaoService {
         this.salaRepository = salaRepository;
     }
 
-    public void cadastrarEstacao(Estacao estacao) {
+    public void cadastrarEstacao(Estacao estacao, MultipartFile file) {
 
-        verificarDisponibilidadeSala(estacao.getSala());
+        if (file != null && !file.isEmpty()) {
+            try {
+                String diretorio = new File("imagens/estacoes").getAbsolutePath();
+
+                String nomeArquivoSeguro = file.getOriginalFilename()
+                        .replaceAll(" ", "_")
+                        .replaceAll("\\(", "_")
+                        .replaceAll("\\)", "");
+
+                File pasta = new File(diretorio);
+                if (!pasta.exists()) {
+                    pasta.mkdirs();
+                }
+
+                File destino = new File(pasta, nomeArquivoSeguro);
+                file.transferTo(destino);
+
+                estacao.setFotoUrl(nomeArquivoSeguro);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar a imagem: " + e.getMessage());
+            }
+        }
+
+        verificarDisponibilidadeSalaCadastro(estacao);
 
         estacao.setAtivo(true);
         estacao.setDisponivel(true);
@@ -34,12 +61,36 @@ public class EstacaoService {
         estacaoRepository.save(estacao);
     }
 
-    public void atualizarEstacao(AtualizarEstacaoDTO estacao) {
+    public void atualizarEstacao(AtualizarEstacaoDTO estacao, MultipartFile file) {
 
         Estacao estacaoExiste = estacaoRepository.findById(estacao.id())
                 .orElseThrow(() -> new AtualizarEstacaoException("Estação não encontrada", ""));
 
-        verificarDisponibilidadeSala(estacao.sala());
+        if (file != null && !file.isEmpty()) {
+            try {
+                String diretorio = new File("imagens/estacoes").getAbsolutePath();
+
+                String nomeArquivoSeguro = file.getOriginalFilename()
+                        .replaceAll(" ", "_")
+                        .replaceAll("\\(", "_")
+                        .replaceAll("\\)", "");
+
+                File pasta = new File(diretorio);
+                if (!pasta.exists()) {
+                    pasta.mkdirs();
+                }
+
+                File destino = new File(pasta, nomeArquivoSeguro);
+                file.transferTo(destino);
+
+                estacaoExiste.setFotoUrl(nomeArquivoSeguro);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar a imagem: " + e.getMessage());
+            }
+        }
+
+        verificarDisponibilidadeSala(estacaoExiste, estacao);
         aplicarAtualizacaoSala(estacaoExiste, estacao);
 
         estacaoRepository.save(estacaoExiste);
@@ -83,14 +134,33 @@ public class EstacaoService {
         return listagemEstacoesInativas(pageable);
     }
 
-    private void verificarDisponibilidadeSala(Sala sala) {
+    private void verificarDisponibilidadeSala(Estacao estacao, AtualizarEstacaoDTO estacaoDTO) {
 
-        Sala salaEncontrada = salaRepository.findById(sala.getId())
-                .orElseThrow(() -> new EstacaoException("Sala não encontrada", ""));
+        if (estacaoDTO.sala() != null) {
+            Sala sala = salaRepository.findById(estacaoDTO.sala().getId())
+                    .orElseThrow(() -> new EstacaoException("Sala nao encontrada", ""));
 
-        if (!salaEncontrada.isDisponivel()) {
-            throw new EstacaoException("Sala indisponível no momento, por favor escolha outra sala!", "");
+            if (!sala.isDisponivel()) {
+                throw new EstacaoException("Sala nao disponivel", "");
+            } else {
+                sala.setDisponivel(false);
+                estacao.getSala().setDisponivel(true);
+                salaRepository.save(sala);
+            }
         }
+    }
+
+    private void verificarDisponibilidadeSalaCadastro(Estacao estacao) {
+
+        Sala sala = salaRepository.findById(estacao.getSala().getId())
+                .orElseThrow(() -> new EstacaoException("Sala nao encontrada", ""));
+
+        if (!sala.isDisponivel()) {
+            throw new EstacaoException("Sala nao disponivel", "");
+        }
+
+        sala.setDisponivel(false);
+        salaRepository.save(sala);
     }
 
     private void aplicarAtualizacaoSala(Estacao estacaoExiste, AtualizarEstacaoDTO estacao) {
@@ -126,6 +196,7 @@ public class EstacaoService {
         if (estacao.sala() != null) {
             estacaoExiste.setSala(estacao.sala());
         }
+
     }
 
     private Estacao obterEstacaoId(AtualizarEstacaoDTO estacao) {

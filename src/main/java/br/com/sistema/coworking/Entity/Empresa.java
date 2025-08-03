@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -53,8 +54,9 @@ public class Empresa {
     private String telefone;
     @OneToOne(targetEntity = Visitante.class)
     private Visitante responsavel;
-    @NotBlank
-    private String ramo;
+    @ManyToOne
+    @JoinColumn(name = "ramo_id", nullable = false)
+    private RamoEmpresarial ramo;
     @NotNull
     @ManyToOne(targetEntity = Endereco.class)
     private Endereco endereco;
@@ -65,7 +67,8 @@ public class Empresa {
     private boolean ativo;
 
     public Empresa(long id, @NotBlank String nomeFantasia, @NotBlank String razaoSocial, @NotBlank String cnpj,
-            @NotBlank @Email String email, @NotBlank String telefone, Visitante responsavel, @NotBlank String ramo,
+            @NotBlank @Email String email, @NotBlank String telefone, Visitante responsavel,
+            @NotBlank RamoEmpresarial ramo,
             @NotNull Endereco endereco, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao,
             AprovacaoStatus status, boolean ativo) {
         this.id = id;

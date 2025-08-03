@@ -1,8 +1,12 @@
 package br.com.sistema.coworking.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import br.com.sistema.coworking.DTO.Sala.AtualizarSalaDTO;
 import br.com.sistema.coworking.Entity.Sala;
 import br.com.sistema.coworking.Exception.Records.Sala.AtualizarSalaException;
@@ -18,17 +22,67 @@ public class SalaService {
         this.salaRepository = salaRepository;
     }
 
-    public void criarSala(Sala sala) {
+    public void criarSala(Sala sala, MultipartFile file) {
 
         verificandoCadastroSala(sala);
+
+        sala.setDataCriacao(LocalDateTime.now());
+        sala.setDisponivel(true);
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                String diretorio = new File("imagens/salas").getAbsolutePath();
+
+                String nomeArquivoSeguro = file.getOriginalFilename()
+                        .replaceAll(" ", "_")
+                        .replaceAll("\\(", "_")
+                        .replaceAll("\\)", "");
+
+                File pasta = new File(diretorio);
+                if (!pasta.exists()) {
+                    pasta.mkdirs();
+                }
+
+                File destino = new File(pasta, nomeArquivoSeguro);
+                file.transferTo(destino);
+
+                sala.setFotoUrl(nomeArquivoSeguro);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar a imagem: " + e.getMessage());
+            }
+        }
 
         salaRepository.save(sala);
     }
 
-    public void atualizarSala(AtualizarSalaDTO atualizarSala) {
+    public void atualizarSala(AtualizarSalaDTO atualizarSala, MultipartFile file) {
 
         Sala salaExiste = salaRepository.findById(atualizarSala.id())
                 .orElseThrow(() -> new SalaException("Sala não encontrada!", ""));
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                String diretorio = new File("imagens/salas").getAbsolutePath();
+
+                String nomeArquivoSeguro = file.getOriginalFilename()
+                        .replaceAll(" ", "_")
+                        .replaceAll("\\(", "_")
+                        .replaceAll("\\)", "");
+
+                File pasta = new File(diretorio);
+                if (!pasta.exists()) {
+                    pasta.mkdirs();
+                }
+
+                File destino = new File(pasta, nomeArquivoSeguro);
+                file.transferTo(destino);
+
+                salaExiste.setFotoUrl(nomeArquivoSeguro);
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar a imagem: " + e.getMessage());
+            }
+        }
 
         verificandoAtualizacao(atualizarSala, salaExiste);
         aplicandoAtualizacao(atualizarSala, salaExiste);

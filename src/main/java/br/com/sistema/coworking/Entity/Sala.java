@@ -28,7 +28,7 @@ public class Sala {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotBlank
     @Column(unique = true)
     private String nome;

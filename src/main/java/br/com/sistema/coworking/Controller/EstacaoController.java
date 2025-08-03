@@ -1,15 +1,27 @@
 package br.com.sistema.coworking.Controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import br.com.sistema.coworking.DTO.Estacao.AtualizarEstacaoDTO;
 import br.com.sistema.coworking.Entity.Estacao;
 import br.com.sistema.coworking.Exception.Records.Estacao.AtualizarEstacaoException;
@@ -34,7 +46,7 @@ public class EstacaoController {
         this.estacaoService = estacaoService;
     }
 
-    @PostMapping("/cadastrar")
+    @PostMapping(value = "/cadastrar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar estacao", description = "Cria uma nova estacao com base nas informações fornecidas no corpo da requisição.")
     @Parameters({
             @Parameter(name = "estacao", description = "Informações da estacao para criar.")
@@ -43,17 +55,19 @@ public class EstacaoController {
             @ApiResponse(responseCode = "201", description = "Estacao cadastrada com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao cadastrar estacao.")
     })
-    public ResponseEntity<String> cadastrarEstacao(@RequestBody @Valid Estacao estacao) {
+    public ResponseEntity<String> cadastrarEstacao(
+            @RequestPart("estacao") Estacao estacao,
+            @RequestPart("file") MultipartFile file) {
 
         try {
-            estacaoService.cadastrarEstacao(estacao);
+            estacaoService.cadastrarEstacao(estacao, file);
             return ResponseEntity.ok("Estacao cadastrada com sucesso!");
         } catch (CadastroEstacaoException e) {
             return ResponseEntity.status(400).body("Erro ao cadastrar estacao: " + e.getMessage());
         }
     }
 
-    @PutMapping("/atualizar")
+    @PutMapping(value = "/atualizar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualizar estacao", description = "Atualiza uma estacao com base nas informações fornecidas no corpo da requisição.")
     @Parameters({
             @Parameter(name = "estacao", description = "Informações da estacao para atualizar.")
@@ -62,10 +76,12 @@ public class EstacaoController {
             @ApiResponse(responseCode = "200", description = "Estacao atualizada com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao atualizar estacao.")
     })
-    public ResponseEntity<String> atualizarEstacao(@RequestBody @Valid AtualizarEstacaoDTO estacao) {
+    public ResponseEntity<String> atualizarEstacao(
+            @RequestPart("estacao") AtualizarEstacaoDTO estacao,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
         try {
-            estacaoService.atualizarEstacao(estacao);
+            estacaoService.atualizarEstacao(estacao, file);
             return ResponseEntity.ok("Estacao atualizada com sucesso!");
         } catch (AtualizarEstacaoException e) {
             return ResponseEntity.status(400).body("Erro ao atualizar estacao: " + e.getMessage());
@@ -119,12 +135,12 @@ public class EstacaoController {
             @ApiResponse(responseCode = "200", description = "Estacao obtida com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao obter estacao.")
     })
-    public ResponseEntity<String> obterEstacao(@RequestBody @Valid AtualizarEstacaoDTO estacao) {
-
+    public ResponseEntity<Estacao> obterEstacao(@RequestBody @Valid AtualizarEstacaoDTO estacao) {
         try {
-            return ResponseEntity.status(200).body(estacaoService.obterEstacao(estacao).toString());
+            Estacao estacaoObtida = estacaoService.obterEstacao(estacao);
+            return ResponseEntity.ok(estacaoObtida);
         } catch (AtualizarEstacaoException e) {
-            return ResponseEntity.status(400).body("Erro ao obter estacao: " + e.getMessage());
+            return ResponseEntity.status(400).body(null);
         }
     }
 
@@ -135,7 +151,7 @@ public class EstacaoController {
             @ApiResponse(responseCode = "400", description = "Erro ao obter estacoes."),
     })
     public ResponseEntity<Page<Estacao>> listarEstacoes(
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 5) Pageable pageable) {
         try {
             return ResponseEntity.ok(estacaoService.listarEstacoes(pageable));
         } catch (AtualizarEstacaoException e) {
@@ -172,5 +188,28 @@ public class EstacaoController {
             return ResponseEntity.status(400).body(Page.empty());
         }
     }
-}
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/imagens/estacao/{nomeArquivo}")
+    public ResponseEntity<Resource> getImagem(@PathVariable String nomeArquivo) {
+        try {
+            Path caminhoImagem = Paths.get("imagens", "estacoes", nomeArquivo).normalize();
+            Resource recurso = new UrlResource(caminhoImagem.toUri());
+
+            if (!recurso.exists() || !recurso.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(caminhoImagem);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(recurso);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}

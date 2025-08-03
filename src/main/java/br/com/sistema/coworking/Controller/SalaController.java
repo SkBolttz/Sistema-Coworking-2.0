@@ -1,10 +1,18 @@
 package br.com.sistema.coworking.Controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import br.com.sistema.coworking.DTO.Sala.AtualizarSalaDTO;
 import br.com.sistema.coworking.Entity.Sala;
 import br.com.sistema.coworking.Exception.Records.Sala.CadastroSalaExecption;
@@ -28,36 +36,42 @@ public class SalaController {
         this.salaService = salaService;
     }
 
-    @PostMapping("/criar")
+    @PostMapping(value = "/criar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Criar sala", description = "Cria uma nova sala com base nas informações fornecidas no corpo da requisição.")
     @Parameters({
             @Parameter(name = "sala", description = "Informações da sala para criar."),
+            @Parameter(name = "file", description = "Imagem da sala para criar."),
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sala criada com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao criar sala."),
     })
-    public ResponseEntity<String> criarSala(@RequestBody @Valid Sala sala) {
+    public ResponseEntity<?> criarSala(
+            @RequestPart("sala") Sala sala,
+            @RequestPart("file") MultipartFile file) {
         try {
-            salaService.criarSala(sala);
+            salaService.criarSala(sala, file);
             return ResponseEntity.ok("Sala criada com sucesso!");
         } catch (CadastroSalaExecption e) {
             return ResponseEntity.badRequest().body("Erro ao criar sala: " + e.getMessage());
         }
     }
 
-    @PutMapping("/atualizar")
+    @PutMapping(value = "/atualizar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualizar sala", description = "Atualiza uma sala existente com base nas informações fornecidas no corpo da requisição.")
     @Parameters({
             @Parameter(name = "atualizarSala", description = "Informações da sala para atualizar."),
+            @Parameter(name = "file", description = "Imagem da sala para atualizar."),
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sala atualizada com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao atualizar sala."),
     })
-    public ResponseEntity<String> atualizarSala(@RequestBody @Valid AtualizarSalaDTO atualizarSala) {
+    public ResponseEntity<String> atualizarSala(
+            @RequestPart("atualizarSala") AtualizarSalaDTO atualizarSala,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
-            salaService.atualizarSala(atualizarSala);
+            salaService.atualizarSala(atualizarSala, file);
             return ResponseEntity.ok("Sala atualizada com sucesso!");
         } catch (CadastroSalaExecption e) {
             return ResponseEntity.badRequest().body("Erro ao atualizar sala: " + e.getMessage());
@@ -125,7 +139,7 @@ public class SalaController {
             @ApiResponse(responseCode = "400", description = "Erro ao obter salas."),
     })
     public ResponseEntity<Page<Sala>> listarSalas(
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 5) Pageable pageable) {
         try {
             Page<Sala> salas = salaService.listarSalas(pageable);
             return ResponseEntity.ok(salas);
@@ -163,6 +177,30 @@ public class SalaController {
             return ResponseEntity.ok(salasIndisponiveis);
         } catch (CadastroSalaExecption e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/imagens/sala/{nomeArquivo}")
+    public ResponseEntity<Resource> getImagem(@PathVariable String nomeArquivo) {
+        try {
+            Path caminhoImagem = Paths.get("imagens", "salas", nomeArquivo).normalize();
+            Resource recurso = new UrlResource(caminhoImagem.toUri());
+
+            if (!recurso.exists() || !recurso.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(caminhoImagem);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(recurso);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

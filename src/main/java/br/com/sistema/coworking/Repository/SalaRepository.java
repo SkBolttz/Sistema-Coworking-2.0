@@ -7,12 +7,12 @@ import org.springframework.stereotype.Repository;
 import br.com.sistema.coworking.Entity.Sala;
 
 @Repository
-public interface SalaRepository extends JpaRepository<Sala,Long>{
+public interface SalaRepository extends JpaRepository<Sala, Long> {
 
     Sala findByNome(String nome);
 
     Page<Sala> findByDisponivelTrue(Pageable pageable);
 
     Page<Sala> findByDisponivelFalse(Pageable pageable);
-    
+
 }

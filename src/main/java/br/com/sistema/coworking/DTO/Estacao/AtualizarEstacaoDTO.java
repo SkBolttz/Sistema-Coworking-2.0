@@ -3,7 +3,7 @@ package br.com.sistema.coworking.DTO.Estacao;
 import br.com.sistema.coworking.Entity.Sala;
 
 public record AtualizarEstacaoDTO(
-        long id,
+        Long id,
         String identificador,
         String descricao,
         Boolean disponivel,

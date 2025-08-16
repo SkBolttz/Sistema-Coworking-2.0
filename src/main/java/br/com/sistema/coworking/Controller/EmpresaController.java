@@ -109,9 +109,10 @@ public class EmpresaController {
             @ApiResponse(responseCode = "200", description = "Empresa obtida com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao obter empresa.")
     })
-    public ResponseEntity<String> obterEmpresa(@RequestBody @Valid AtualizarEmpresaDTO empresa) {
+    public ResponseEntity<Empresa> obterEmpresa(@RequestBody @Valid AtualizarEmpresaDTO empresa) {
         try {
-            return ResponseEntity.status(200).body(empresaService.obter(empresa).toString());
+            Empresa empresaObtida = empresaService.obter(empresa);
+            return ResponseEntity.ok(empresaObtida);
         } catch (CadastroEmpresaException e) {
             return ResponseEntity.status(400).body(null);
         }
@@ -162,3 +163,4 @@ public class EmpresaController {
         }
     }
 }
+ 

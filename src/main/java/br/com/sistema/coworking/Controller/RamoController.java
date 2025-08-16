@@ -45,7 +45,7 @@ public class RamoController {
         }
     }
 
-    @GetMapping("/obter-ramos")
+    @GetMapping("/obter-ramos")     
     @Operation(summary = "Obter Ramos", description = "Realiza a listagem de todos os ramos cadastrados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ramos obtidos com sucesso."),
@@ -53,7 +53,7 @@ public class RamoController {
     })
     public ResponseEntity<List<RamoEmpresarial>> obterRamos() {
         try {
-            return ramoService.obterRamos();
+            return ResponseEntity.status(200).body(ramoService.obterRamos());
         } catch (Exception e) {
             return ResponseEntity.status(400).body(null);
         }

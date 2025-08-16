@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import br.com.sistema.coworking.DTO.Empresa.AtualizarEmpresaDTO;
 import br.com.sistema.coworking.Entity.Empresa;
+import br.com.sistema.coworking.Entity.RamoEmpresarial;
 import br.com.sistema.coworking.Entity.Visitante;
 import br.com.sistema.coworking.Enum.AprovacaoStatus;
 import br.com.sistema.coworking.Exception.Records.Empresa.AtualizarEmpresaException;
 import br.com.sistema.coworking.Exception.Records.Empresa.CadastroEmpresaException;
 import br.com.sistema.coworking.Repository.EmpresaRepository;
+import br.com.sistema.coworking.Repository.RamoEmpresarialRepository;
 import br.com.sistema.coworking.Repository.VisitanteRepository;
 import jakarta.transaction.Transactional;
 
@@ -20,22 +22,27 @@ public class EmpresaService {
 
     private final EmpresaRepository empresaRepository;
     private final EnderecoService enderecoService;
+    private final RamoEmpresarialRepository ramoEmpresarialRepository;
     private final VisitanteRepository visitanteRepository;
 
     public EmpresaService(EmpresaRepository empresaRepository, EnderecoService enderecoService,
-            VisitanteRepository visitanteRepository) {
+            VisitanteRepository visitanteRepository, RamoEmpresarialRepository ramoEmpresarialRepository) {
         this.empresaRepository = empresaRepository;
         this.enderecoService = enderecoService;
         this.visitanteRepository = visitanteRepository;
+        this.ramoEmpresarialRepository = ramoEmpresarialRepository;
     }
 
     @Transactional
     public void cadastro(Empresa empresa) {
 
-        Optional<Visitante> visitanteExistente = visitanteRepository.findByCpf(empresa.getResponsavel().getCpf());
+        Long id = empresa.getResponsavel().getId();
+        Optional<Visitante> visitanteExistente = visitanteRepository.findById(id);
+
+        RamoEmpresarial ramoExistente = ramoEmpresarialRepository.findByRamo(empresa.getRamo().getRamo());
 
         verificarCadastro(empresa, visitanteExistente);
-        aplicandoCadastro(empresa, visitanteExistente);
+        aplicandoCadastro(empresa, visitanteExistente, ramoExistente);
 
         empresaRepository.save(empresa);
     }
@@ -61,8 +68,9 @@ public class EmpresaService {
     public void atualizar(AtualizarEmpresaDTO empresa) {
 
         Empresa empresaExiste = empresaRepository.findByCnpj(empresa.cnpj());
-        verificarAtualizacao(empresa, empresaExiste);
-        aplicandoAtualizacao(empresa, empresaExiste);
+        Visitante visitanteExistente = visitanteRepository.findById(empresa.responsavel().getId()).orElse(null);
+        verificarAtualizacao(empresa, empresaExiste, visitanteExistente);
+        aplicandoAtualizacao(empresa, empresaExiste, visitanteExistente);
 
         empresaRepository.save(empresaExiste);
     }
@@ -115,8 +123,10 @@ public class EmpresaService {
         }
     }
 
-    private void aplicandoCadastro(Empresa empresa, Optional<Visitante> visitanteExistente) {
+    private void aplicandoCadastro(Empresa empresa, Optional<Visitante> visitanteExistente,
+            RamoEmpresarial ramoExistente) {
 
+        empresa.setRamo(ramoExistente);
         empresa.setResponsavel(visitanteExistente.get());
         empresa.setAtivo(true);
         empresa.setDataCriacao(LocalDateTime.now());
@@ -140,7 +150,8 @@ public class EmpresaService {
         }
     }
 
-    private void verificarAtualizacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
+    private void verificarAtualizacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste,
+            Visitante visitanteExistente) {
 
         if (empresaExiste == null) {
             throw new AtualizarEmpresaException("Empresa com CNPJ",
@@ -148,8 +159,7 @@ public class EmpresaService {
         }
 
         if (empresa.responsavel() != null) {
-            Visitante visitanteExistente = visitanteRepository
-                    .findByNomeCompleto(empresa.responsavel().getNomeCompleto());
+            visitanteExistente = visitanteRepository.findByNomeCompleto(empresa.responsavel().getNomeCompleto());
 
             if (visitanteExistente == null) {
                 throw new AtualizarEmpresaException("Visitante com nome",
@@ -157,28 +167,32 @@ public class EmpresaService {
             }
         }
 
-        if (empresaRepository.findByNomeFantasia(empresa.nomeFantasia()) != null) {
+        if (empresaRepository.findByNomeFantasia(empresa.nomeFantasia()) != null
+                && !empresaExiste.getNomeFantasia().equals(empresa.nomeFantasia())) {
             throw new AtualizarEmpresaException("Empresa com nome fantasia",
                     "Empresa com esse nome fantasia ja cadastrada.");
         }
 
-        if (empresaRepository.findByRazaoSocial(empresa.razaoSocial()) != null) {
+        if (empresaRepository.findByRazaoSocial(empresa.razaoSocial()) != null
+                && !empresaExiste.getRazaoSocial().equals(empresa.razaoSocial())) {
             throw new AtualizarEmpresaException("Empresa com razao social",
                     "Empresa com essa razao social ja cadastrada.");
         }
 
-        if (empresaRepository.findByEmail(empresa.email()) != null) {
+        if (empresaRepository.findByEmail(empresa.email()) != null
+                && !empresaExiste.getEmail().equals(empresa.email())) {
             throw new AtualizarEmpresaException("Empresa com email",
                     "Empresa com esse email ja cadastrada.");
         }
 
-        if (empresaRepository.findByTelefone(empresa.telefone()) != null) {
+        if (empresaRepository.findByTelefone(empresa.telefone()) != null
+                && !empresaExiste.getTelefone().equals(empresa.telefone())) {
             throw new AtualizarEmpresaException("Empresa com telefone",
                     "Empresa com esse telefone ja cadastrada.");
         }
     }
 
-    private void aplicandoAtualizacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste) {
+    private void aplicandoAtualizacao(AtualizarEmpresaDTO empresa, Empresa empresaExiste, Visitante visitanteExistente) {
 
         if (empresa.nomeFantasia() != null) {
             empresaExiste.setNomeFantasia(empresa.nomeFantasia());
@@ -201,7 +215,7 @@ public class EmpresaService {
         }
 
         if (empresa.responsavel() != null) {
-            empresaExiste.setResponsavel(empresa.responsavel());
+            empresaExiste.setResponsavel(visitanteExistente);
         }
 
         if (empresa.endereco() != null) {

@@ -1,9 +1,7 @@
 package br.com.sistema.coworking.Service;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import br.com.sistema.coworking.Entity.RamoEmpresarial;
 import br.com.sistema.coworking.Exception.Records.Ramo.CadastroRamoException;
@@ -26,7 +24,7 @@ public class RamoService {
         ramoEmpresarialRepository.save(ramo);
     }
 
-    public ResponseEntity<List<RamoEmpresarial>> obterRamos() {
-        return ResponseEntity.ok(ramoEmpresarialRepository.findAll());
+    public List<RamoEmpresarial> obterRamos() {
+        return (ramoEmpresarialRepository.findAll());
     }
 }

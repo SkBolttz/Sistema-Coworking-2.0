@@ -147,7 +147,7 @@ public class VisitanteController {
             @ApiResponse(responseCode = "400", description = "Erro ao listar funcionarios."),
     })
     public ResponseEntity<Page<Visitante>> listarFuncionario(
-            Pageable pageable) {
+            @PageableDefault(size = 10) Pageable pageable) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(visitanteService.listarFuncionario(pageable));
         } catch (DadosException e) {

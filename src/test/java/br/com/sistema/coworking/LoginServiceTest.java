@@ -61,7 +61,7 @@ public class LoginServiceTest {
 
         Visitante visitante = criarVisitante();
 
-        loginService.registro(visitante);
+        loginService.registro(visitante, null);
 
         verify(visitanteRepository, times(1)).save(visitante);
         assertEquals(visitante.getTipo(), TipoVisitante.VISITANTE);
@@ -72,7 +72,7 @@ public class LoginServiceTest {
 
         Visitante visitante = criarFuncionario();
 
-        loginService.registro(visitante);
+        loginService.registro(visitante, null);
 
         verify(visitanteRepository, times(1)).save(visitante);
         assertEquals(visitante.getTipo(), TipoVisitante.FUNCIONARIO);
@@ -83,7 +83,7 @@ public class LoginServiceTest {
 
         Visitante visitante = criarAdmin();
 
-        loginService.registro(visitante);
+        loginService.registro(visitante, null);
 
         verify(visitanteRepository, times(1)).save(visitante);
         assertEquals(visitante.getTipo(), TipoVisitante.ADMIN);

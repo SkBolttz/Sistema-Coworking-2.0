@@ -51,7 +51,7 @@ public class SalaServiceTest {
 
         Sala sala = criarSala();
 
-        salaService.criarSala(sala);
+        salaService.criarSala(sala, null);
 
         verify(salaRepository, times(1)).save(sala);
     }
@@ -67,7 +67,7 @@ public class SalaServiceTest {
                 null, null,
                 null);
 
-        salaService.atualizarSala(salaDTO);
+        salaService.atualizarSala(salaDTO, null);
 
         verify(salaRepository, times(1)).save(sala);
         assertEquals("Sala A atualizada", sala.getNome());

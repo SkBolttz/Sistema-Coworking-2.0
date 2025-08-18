@@ -64,7 +64,7 @@ public class EstacaoServiceTest {
         when(salaRepository.findById(sala.getId())).thenReturn(Optional.of(sala));
         when(estacaoRepository.save(estacao)).thenReturn(estacao);
 
-        estacaoService.cadastrarEstacao(estacao);
+        estacaoService.cadastrarEstacao(estacao, null);
 
         verify(estacaoRepository, times(1)).save(estacao);
     }
@@ -80,7 +80,7 @@ public class EstacaoServiceTest {
         AtualizarEstacaoDTO estacaoDTO = new AtualizarEstacaoDTO(Long.valueOf(1), "Nome atualizado com sucesso", null,
                 null, null, null, null, null, sala);
 
-        estacaoService.atualizarEstacao(estacaoDTO);
+        estacaoService.atualizarEstacao(estacaoDTO, null);
 
         assertEquals(estacaoDTO.identificador(), "Nome atualizado com sucesso");
     }

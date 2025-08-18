@@ -66,13 +66,13 @@ public class EmpresaServiceTest {
 
     private Empresa criarEmpresaAtiva(Visitante visitante, Endereco endereco) {
         return new Empresa(1L, "Empresa Teste", "Razao Social Teste", cnpj,
-                "0000000000", "0000000000", visitante, "Infraestrutura", endereco,
+                "0000000000", "0000000000", visitante, null, endereco,
                 LocalDateTime.now(), LocalDateTime.now(), AprovacaoStatus.PENDENTE, true);
     }
 
     private Empresa criarEmpresaInativa(Visitante visitante, Endereco endereco) {
         return new Empresa(1L, "Empresa Teste", "Razao Social Teste", cnpj,
-                "0000000000", "0000000000", visitante, "Infraestrutura", endereco,
+                "0000000000", "0000000000", visitante, null, endereco,
                 LocalDateTime.now(), LocalDateTime.now(), AprovacaoStatus.PENDENTE, false);
     }
 

@@ -27,4 +27,9 @@ public record AtualizarVisitante(
         this.confirmaSenha = confirmaSenha;
     }
 
+    public AtualizarVisitante(String cpf, String nomeCompleto, String telefone, String senha, String observacao,
+            String fotoDocumento, String email) {
+        this(0, cpf, nomeCompleto, telefone, senha, observacao, fotoDocumento, email, null, null);
+    }
+
 }

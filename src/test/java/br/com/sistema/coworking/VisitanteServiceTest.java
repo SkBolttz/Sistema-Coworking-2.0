@@ -56,7 +56,7 @@ public class VisitanteServiceTest {
                 "pedro@gmail.com",
                 "123456789", "0000000000", "documento.png", "obs:teste");
 
-        visitanteService.atualizarDados(visitanteAtualizado);
+        visitanteService.atualizarDados(visitanteAtualizado, null);
 
         verify(visitanteRepository, times(1)).save(visitante);
         assertEquals("Nome Atualizado", visitante.getNomeCompleto());

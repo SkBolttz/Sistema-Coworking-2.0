@@ -36,6 +36,7 @@ public class LoginService {
         visitante.setDataCadastro(LocalDateTime.now());
         visitante.setAtivo(true);
         visitante.setSenha(passwordEncoder.encode(visitante.getSenha()));
+        visitante.setEmpresa(visitante.getEmpresa());
 
         if (file != null) {
             visitante.setFotoDocumentoUrl(file.getOriginalFilename());

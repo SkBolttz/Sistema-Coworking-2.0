@@ -14,8 +14,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://nexuscoworking.vercel.app/")
-                        .allowedMethods("*") 
+                        .allowedOrigins("https://nexuscoworking.vercel.app")
+                        .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }

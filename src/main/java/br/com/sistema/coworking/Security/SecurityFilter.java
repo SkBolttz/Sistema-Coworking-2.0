@@ -30,7 +30,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        if (path.equals("/auth/login") || path.equals("/auth/registro")) {
+        if (path.equals("/auth/login") || path.equals("/auth/registro") || path.equals("/visitante/verificarEmail")) {
             filterChain.doFilter(request, response);
             return;
         }

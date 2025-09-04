@@ -11,6 +11,7 @@ import br.com.sistema.coworking.DTO.Sala.AtualizarSalaDTO;
 import br.com.sistema.coworking.Entity.Sala;
 import br.com.sistema.coworking.Exception.Records.Sala.AtualizarSalaException;
 import br.com.sistema.coworking.Exception.Records.Sala.SalaException;
+import br.com.sistema.coworking.Repository.EstacaoRepository;
 import br.com.sistema.coworking.Repository.SalaRepository;
 
 @Service
@@ -18,8 +19,11 @@ public class SalaService {
 
     private final SalaRepository salaRepository;
 
-    public SalaService(SalaRepository salaRepository) {
+    private final EstacaoRepository estacaoRepository;
+
+    public SalaService(SalaRepository salaRepository, EstacaoRepository estacaoRepository) {
         this.salaRepository = salaRepository;
+        this.estacaoRepository = estacaoRepository;
     }
 
     public void criarSala(Sala sala, MultipartFile file) {
@@ -95,6 +99,12 @@ public class SalaService {
         Sala salaExiste = salaRepository.findById(atualizarSala.id())
                 .orElseThrow(() -> new SalaException("Sala não encontrada!", ""));
 
+        Sala salaVinculada = estacaoRepository.findBySala(salaExiste.getId()).orElse(null);
+
+        if(salaVinculada != null){
+            throw new SalaException("Sala vinculada a uma estação!", "");
+        }
+        
         salaExiste.setDisponivel(true);
         salaRepository.save(salaExiste);
     }

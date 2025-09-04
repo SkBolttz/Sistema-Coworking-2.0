@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -30,6 +31,7 @@ import jakarta.validation.Valid;
 
 @RequestMapping("/visitante")
 @RestController
+@CrossOrigin(origins = "*")
 @Tag(name = "Visitante", description = "Controller responsável por gerenciar as informações dos visitantes.")
 public class VisitanteController {
 
@@ -136,8 +138,11 @@ public class VisitanteController {
             @ApiResponse(responseCode = "400", description = "Erro ao verificar email."),
     })
     public ResponseEntity<Boolean> verificarEmail(@RequestBody @Valid AtualizarVisitante atualizarVisitante) {
-        boolean existe = visitanteService.verificarEmail(atualizarVisitante);
-        return ResponseEntity.status(HttpStatus.OK).body(existe);
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(visitanteService.verificarEmail(atualizarVisitante));
+        } catch (DadosException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/listar/funcionario")

@@ -95,6 +95,10 @@ public class SalaService {
         Sala salaExiste = salaRepository.findById(atualizarSala.id())
                 .orElseThrow(() -> new SalaException("Sala não encontrada!", ""));
 
+        if (salaExiste.getEstacao() != null) {
+            throw new AtualizarSalaException("Sala com estação vinculada!", "");
+        }
+        
         salaExiste.setDisponivel(true);
         salaRepository.save(salaExiste);
     }

@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "https://nexuscoworking.vercel.app")
+@CrossOrigin(origins = "*")
 @Tag(name = "Autenticação", description = "Controller responsável por gerenciar as informações de autenticação.")
 public class AuthenticationService {
 

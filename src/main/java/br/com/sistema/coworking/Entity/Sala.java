@@ -47,8 +47,6 @@ public class Sala {
     private String localizacao;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataManutencao;
-    @OneToOne(mappedBy = "sala", orphanRemoval = true)
-    private Estacao estacao;
 
     public Sala(long id, String nome, String descricao, int quantidade, boolean disponivel, TipoSala tipo,
             String fotoUrl,

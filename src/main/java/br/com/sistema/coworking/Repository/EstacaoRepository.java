@@ -17,6 +17,6 @@ public interface EstacaoRepository extends JpaRepository<Estacao,Long>{
 
     Page<Estacao> findByAtivoTrue(Pageable pageable);
 
-    Optional<Sala> findBySala(Long id);
+    Optional<Sala> findBySalaId(Long id);
     
 }
